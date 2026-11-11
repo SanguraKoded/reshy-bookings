@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reshy Beauty Studio – Staff Bookings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;500;700&family=Cabin+Sketch:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --rose:#C9667F; --rose-dark:#B0506A; --brown:#6B4226; --blush:#FBF1EF;
+  --petal:#E9D2D3; --line:#D9A9B5; --white:#fff; --ok:#3d7a4f;
+  --nails:#C9667F; --hair:#6B4226;
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:Cabin,system-ui,sans-serif;color:var(--brown);background:
+  radial-gradient(circle at 90% 5%,#F3D6DC 0,transparent 40%),
+  radial-gradient(circle at 5% 95%,#F3D6DC 0,transparent 35%),var(--blush);
+  min-height:100vh;line-height:1.45}
+h1,h2,h3{margin:0}
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+header.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.brand .name{font-weight:700;font-size:2rem;color:var(--rose);letter-spacing:.5px;line-height:1}
+.brand .sub{font-weight:700;font-size:1.05rem;color:var(--brown)}
+.who{display:flex;align-items:center;gap:10px;font-weight:500}
+button,.btn{font:inherit;font-weight:700;border:0;border-radius:10px;padding:11px 18px;cursor:pointer;background:var(--rose);color:#fff}
+button:hover{background:var(--rose-dark)}
+button.ghost{background:transparent;color:var(--brown);border:2px solid var(--line)}
+button.ghost:hover{background:var(--petal)}
+button.small{padding:6px 10px;font-size:.85rem}
+button.danger{background:transparent;color:var(--rose-dark);border:1.5px solid var(--line)}
+:focus-visible{outline:3px solid var(--brown);outline-offset:2px}
+.panel{background:rgba(255,255,255,.75);border:2px solid var(--line);border-radius:18px;padding:20px}
+label{display:block;font-weight:700;margin:12px 0 4px}
+input,select,textarea{width:100%;font:inherit;color:var(--brown);padding:10px 12px;border:2px solid var(--line);border-radius:10px;background:#fff}
+textarea{resize:vertical;min-height:60px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.msg{margin-top:12px;padding:10px 12px;border-radius:10px;background:var(--petal);display:none}
+.msg.show{display:block}
+.msg.warn{background:#FDE7E7;border:2px solid var(--rose)}
+.msg.good{background:#E6F3EA;color:var(--ok)}
+
+/* pickers */
+.pick{width:100%;text-align:left;background:#fff;color:var(--brown);border:2px solid var(--line);font-weight:500;display:flex;justify-content:space-between;align-items:center}
+.pick:hover{background:#fff;border-color:var(--rose)}
+.pick.sm{width:auto;padding:8px 12px;font-weight:700}
+#cal{position:absolute;z-index:50;width:290px;background:#fff;border:2px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 10px 28px rgba(107,66,38,.22);display:none}
+#cal .ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;font-weight:700;font-size:1.05rem}
+#cal .g{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;text-align:center}
+#cal .wd{font-size:.78rem;font-weight:700;color:var(--rose);padding:4px 0}
+#cal .d{padding:0;height:36px;border-radius:50%;background:transparent;color:var(--brown);font-weight:500}
+#cal .d:hover{background:var(--petal)}
+#cal .d.today{border:2px solid var(--rose)}
+#cal .d.sel{background:var(--rose);color:#fff;font-weight:700}
+#cal .foot{margin-top:8px;text-align:center}
+.time{position:relative;display:flex;justify-content:center;align-items:center;gap:6px;background:#fff;border:2px solid var(--line);border-radius:14px;padding:0 10px}
+.time .band{position:absolute;left:8px;right:8px;top:44px;height:44px;background:var(--petal);border-radius:10px;pointer-events:none}
+.wheel{position:relative;height:132px;width:72px;overflow-y:scroll;scroll-snap-type:y mandatory;scrollbar-width:none;text-align:center;-webkit-mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent);mask-image:linear-gradient(transparent,#000 30%,#000 70%,transparent)}
+.wheel::-webkit-scrollbar{display:none}
+.wheel .pad{display:block;height:44px}
+.wheel .it{height:44px;line-height:44px;scroll-snap-align:center;font-size:1.4rem;font-weight:700;opacity:.45;cursor:pointer;user-select:none}
+.wheel .it.on{opacity:1;color:var(--rose-dark)}
+.time .colon{position:relative;font-size:1.5rem;font-weight:700}
+.timelabel{text-align:center;margin-top:6px;font-weight:700}
+
+/* auth */
+#auth{max-width:420px;margin:6vh auto 0;text-align:center}
+#auth .brand .name{font-size:3rem}
+#auth form{text-align:left;margin-top:14px}
+.tabs{display:flex;gap:8px;margin:18px 0 4px}
+.tabs button{flex:1;background:var(--petal);color:var(--brown)}
+.tabs button.on{background:var(--rose);color:#fff}
+#auth .full{width:100%;margin-top:16px}
+
+/* app */
+#app{display:none}
+.grid{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
+@media(max-width:820px){.grid{grid-template-columns:1fr}}
+.panel h2{font-size:1.35rem;color:var(--rose);margin-bottom:4px}
+.dayhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.dayhead .nav{display:flex;gap:6px;align-items:center}
+.dayhead input{width:auto}
+.daytitle{font-size:1.5rem;font-weight:700;color:var(--brown)}
+.legend{display:flex;gap:14px;font-size:.9rem;margin-bottom:12px}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:5px}
+.list{display:flex;flex-direction:column;gap:10px}
+.card{display:grid;grid-template-columns:96px 1fr auto;gap:12px;align-items:center;background:#fff;border:2px solid var(--line);border-left-width:8px;border-radius:12px;padding:10px 12px}
+.card.nails{border-left-color:var(--nails)} .card.hair{border-left-color:var(--hair)}
+.card .t{font-weight:700;font-size:1.05rem}
+.card .t small{display:block;font-weight:400;opacity:.8}
+.card .svc{font-weight:700}
+.card .meta{font-size:.9rem;opacity:.9}
+.tag{display:inline-block;background:var(--petal);border-radius:20px;padding:1px 10px;font-size:.8rem;font-weight:700}
+.card.clash{background:#FFF3F3}
+.empty{text-align:center;padding:30px 10px;border:2px dashed var(--line);border-radius:14px}
+@media(max-width:520px){.card{grid-template-columns:1fr auto}.card .t{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<div id="cal" role="dialog" aria-label="Calendar"></div>
+<div class="wrap">
+
+  <!-- Setup warning if Firebase not configured -->
+  <div id="setup" class="panel" style="display:none;max-width:640px;margin:8vh auto">
+    <h2>Almost there</h2>
+    <p>Open <b>index.html</b>, find <b>firebaseConfig</b> near the bottom and paste in your Firebase keys. Step-by-step instructions are in <b>README.md</b>.</p>
+  </div>
+
+  <!-- AUTH -->
+  <section id="auth" class="panel" style="display:none">
+    <div class="brand"><div class="name">RESHY</div><div class="sub">Beauty Studio &amp; Cosmetics</div></div>
+    <p>Staff bookings</p>
+    <div class="tabs">
+      <button id="tabIn" class="on" type="button">Log in</button>
+      <button id="tabUp" type="button">Create account</button>
+    </div>
+    <form id="authForm">
+      <div id="nameWrap" style="display:none">
+        <label for="sname">Your name</label>
+        <input id="sname" autocomplete="name" placeholder="e.g. Reshy">
+      </div>
+      <label for="email">Email</label>
+      <input id="email" type="email" required autocomplete="email">
+      <label for="pass">Password</label>
+      <input id="pass" type="password" required minlength="6" autocomplete="current-password">
+      <button class="full" id="authBtn" type="submit">Log in</button>
+      <div id="authMsg" class="msg warn"></div>
+    </form>
+  </section>
+
+  <!-- APP -->
+  <div id="app">
+    <header class="top">
+      <div class="brand"><div class="name">RESHY</div><div class="sub">Beauty Studio &amp; Cosmetics</div></div>
+      <div class="who"><span>Hi, <b id="me"></b></span><button class="ghost small" id="logout">Log out</button></div>
+    </header>
+
+    <div class="grid">
+      <section class="panel">
+        <h2>New booking</h2>
+        <form id="bookForm">
+          <label for="client">Client name</label>
+          <input id="client" required placeholder="e.g. Amina">
+          <label for="contact">Phone / WhatsApp</label>
+          <input id="contact" inputmode="tel" placeholder="07…">
+          <label for="service">Service</label>
+          <select id="service" required>
+            <option value="" disabled selected>Choose a service</option>
+            <optgroup label="Nails Studio">
+              <option data-cat="nails">Manicure</option>
+              <option data-cat="nails">Pedicure</option>
+              <option data-cat="nails">Tips &amp; Gel</option>
+              <option data-cat="nails">Nail Art</option>
+              <option data-cat="nails">Builder</option>
+              <option data-cat="nails">Other (nails)</option>
+            </optgroup>
+            <optgroup label="Hair Salon">
+              <option data-cat="hair">Hair Styling</option>
+              <option data-cat="hair">Braiding</option>
+              <option data-cat="hair">Ghanians</option>
+              <option data-cat="hair">Other (hair)</option>
+            </optgroup>
+          </select>
+          <label for="dateBtn">Date</label>
+          <input type="hidden" id="date">
+          <button type="button" class="pick" id="dateBtn"><span></span><span aria-hidden="true">📅</span></button>
+          <label>Start time</label>
+          <input type="hidden" id="start" value="09:00">
+          <div class="time" role="group" aria-label="Pick start time">
+            <div class="band"></div>
+            <div class="wheel" id="wH" tabindex="0" aria-label="Hour"></div>
+            <div class="colon">:</div>
+            <div class="wheel" id="wM" tabindex="0" aria-label="Minutes"></div>
+            <div class="wheel" id="wP" tabindex="0" aria-label="AM or PM"></div>
+          </div>
+          <div class="timelabel" id="timeLabel"></div>
+          <label for="dur">Duration</label>
+          <select id="dur">
+            <option value="30">30 min</option><option value="60" selected>1 hr</option>
+            <option value="90">1 hr 30</option><option value="120">2 hrs</option>
+            <option value="180">3 hrs</option><option value="240">4 hrs</option>
+            <option value="360">6 hrs</option>
+          </select>
+          <label for="notes">Notes (optional)</label>
+          <textarea id="notes" placeholder="Style, colour, deposit…"></textarea>
+          <button type="submit" style="width:100%;margin-top:16px" id="saveBtn">Save booking</button>
+          <div id="bookMsg" class="msg"></div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="dayhead">
+          <div class="nav">
+            <button class="ghost small" id="prev" aria-label="Previous day">‹</button>
+            <input type="hidden" id="viewDate"><button type="button" class="pick sm" id="viewDateBtn" aria-label="Pick a date to view"></button>
+            <button class="ghost small" id="next" aria-label="Next day">›</button>
+            <button class="ghost small" id="today">Today</button>
+          </div>
+        </div>
+        <div class="daytitle" id="dayTitle"></div>
+        <div class="legend">
+          <span><span class="dot" style="background:var(--nails)"></span>Nails</span>
+          <span><span class="dot" style="background:var(--hair)"></span>Hair</span>
+          <span id="count"></span>
+        </div>
+        <div id="list" class="list"></div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, updateProfile }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+import { getFirestore, collection, query, where, onSnapshot, addDoc, deleteDoc, doc, getDocs, serverTimestamp }
+  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+/* ========= PASTE YOUR FIREBASE CONFIG HERE (see README.md) ========= */
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "000000000000",
+  appId: "YOUR_APP_ID"
+};
+/* =================================================================== */
+
+const $ = id => document.getElementById(id);
+if (firebaseConfig.apiKey === "YOUR_API_KEY") { $("setup").style.display = "block"; throw new Error("Firebase not configured"); }
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+const bookings = collection(db, "bookings");
+
+const pad = n => String(n).padStart(2, "0");
+const toISO = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const toMin = t => { const [h,m] = t.split(":").map(Number); return h*60+m; };
+const toTime = m => `${pad(Math.floor(m/60)%24)}:${pad(m%60)}`;
+const fmt12 = t => { const [h,m] = t.split(":").map(Number); return `${((h+11)%12)+1}:${pad(m)} ${h<12?"am":"pm"}`; };
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+const fmtDate = iso => new Date(iso + "T00:00").toLocaleDateString(undefined, { weekday:"short", day:"numeric", month:"short", year:"numeric" });
+function setDateField(id, iso){
+  $(id).value = iso;
+  const btn = $(id + "Btn");
+  (btn.querySelector("span") || btn).textContent = fmtDate(iso);
+}
+
+/* Calendar popup */
+const cal = $("cal");
+cal.addEventListener("click", e => e.stopPropagation());
+document.addEventListener("click", () => cal.style.display = "none");
+document.addEventListener("keydown", e => { if (e.key === "Escape") cal.style.display = "none"; });
+function openCal(anchor, iso, onPick){
+  const sel = new Date(iso + "T00:00");
+  let y = sel.getFullYear(), m = sel.getMonth();
+  const todayISO = toISO(new Date());
+  const draw = () => {
+    const first = new Date(y, m, 1).getDay(), days = new Date(y, m + 1, 0).getDate();
+    let h = `<div class="ch"><button type="button" class="ghost small" data-m="-1" aria-label="Previous month">‹</button>
+      <span>${new Date(y, m, 1).toLocaleDateString(undefined, { month:"long", year:"numeric" })}</span>
+      <button type="button" class="ghost small" data-m="1" aria-label="Next month">›</button></div><div class="g">`;
+    h += ["S","M","T","W","T","F","S"].map(d => `<div class="wd">${d}</div>`).join("");
+    for (let i = 0; i < first; i++) h += "<div></div>";
+    for (let d = 1; d <= days; d++) {
+      const v = `${y}-${pad(m + 1)}-${pad(d)}`;
+      h += `<button type="button" class="d ${v === todayISO ? "today" : ""} ${v === iso ? "sel" : ""}" data-d="${v}">${d}</button>`;
+    }
+    h += `</div><div class="foot"><button type="button" class="ghost small" data-d="${todayISO}">Today</button></div>`;
+    cal.innerHTML = h;
+  };
+  cal.onclick = e => {
+    e.stopPropagation();
+    const t = e.target.closest("button"); if (!t) return;
+    if (t.dataset.m) { m += Number(t.dataset.m); if (m < 0) { m = 11; y--; } if (m > 11) { m = 0; y++; } draw(); }
+    else if (t.dataset.d) { cal.style.display = "none"; onPick(t.dataset.d); }
+  };
+  draw();
+  cal.style.display = "block";
+  const r = anchor.getBoundingClientRect();
+  cal.style.top = (r.bottom + window.scrollY + 6) + "px";
+  cal.style.left = Math.max(8, Math.min(r.left + window.scrollX, window.innerWidth - 298)) + "px";
+}
+$("dateBtn").onclick = e => { e.stopPropagation(); openCal($("dateBtn"), $("date").value, v => setDateField("date", v)); };
+$("viewDateBtn").onclick = e => { e.stopPropagation(); openCal($("viewDateBtn"), viewDate, v => { viewDate = v; setDateField("viewDate", v); watchDay(); }); };
+
+/* Time wheels (scroll or tap) */
+const ROW = 44;
+const tm = { h:8, m:0, p:0 };           // h index 0-11 => 1-12, m index 0-11 => 0-55, p 0=am 1=pm
+function makeWheel(el, items, key){
+  el.innerHTML = '<i class="pad"></i>' + items.map(t => `<div class="it">${t}</div>`).join("") + '<i class="pad"></i>';
+  const its = [...el.querySelectorAll(".it")];
+  let timer;
+  const mark = () => its.forEach((n, i) => n.classList.toggle("on", i === tm[key]));
+  el.addEventListener("scroll", () => {
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      tm[key] = Math.max(0, Math.min(items.length - 1, Math.round(el.scrollTop / ROW)));
+      mark(); updateStart();
+    }, 90);
+  });
+  el.addEventListener("click", e => {
+    const i = its.indexOf(e.target.closest(".it")); if (i > -1) el.scrollTo({ top: i * ROW, behavior:"smooth" });
+  });
+  return { go: () => { el.scrollTop = tm[key] * ROW; mark(); } };
+}
+const wheels = [
+  makeWheel($("wH"), Array.from({length:12}, (_, i) => i + 1), "h"),
+  makeWheel($("wM"), Array.from({length:12}, (_, i) => pad(i * 5)), "m"),
+  makeWheel($("wP"), ["AM", "PM"], "p")
+];
+function updateStart(){
+  const h24 = ((tm.h + 1) % 12) + (tm.p ? 12 : 0);
+  $("start").value = `${pad(h24)}:${pad(tm.m * 5)}`;
+  $("timeLabel").textContent = fmt12($("start").value);
+}
+function setTime(t){
+  const [h, m] = t.split(":").map(Number);
+  tm.p = h >= 12 ? 1 : 0; tm.h = ((h + 11) % 12); tm.m = Math.round(m / 5) % 12;
+  wheels.forEach(w => w.go()); updateStart();
+}
+
+let signUp = false, unsub = null, current = [], viewDate = toISO(new Date());
+
+/* ---------- Auth ---------- */
+function setMode(up){
+  signUp = up;
+  $("tabIn").classList.toggle("on", !up); $("tabUp").classList.toggle("on", up);
+  $("nameWrap").style.display = up ? "block" : "none";
+  $("sname").required = up;
+  $("authBtn").textContent = up ? "Create account" : "Log in";
+  $("pass").autocomplete = up ? "new-password" : "current-password";
+  $("authMsg").classList.remove("show");
+}
+$("tabIn").onclick = () => setMode(false);
+$("tabUp").onclick = () => setMode(true);
+
+$("authForm").onsubmit = async e => {
+  e.preventDefault();
+  const m = $("authMsg"); m.classList.remove("show");
+  try {
+    if (signUp) {
+      const cred = await createUserWithEmailAndPassword(auth, $("email").value.trim(), $("pass").value);
+      await updateProfile(cred.user, { displayName: $("sname").value.trim() });
+      $("me").textContent = cred.user.displayName;
+    } else {
+      await signInWithEmailAndPassword(auth, $("email").value.trim(), $("pass").value);
+    }
+  } catch (err) {
+    const map = {
+      "auth/invalid-credential":"Wrong email or password.",
+      "auth/email-already-in-use":"That email already has an account. Try logging in.",
+      "auth/weak-password":"Password must be at least 6 characters.",
+      "auth/invalid-email":"Enter a valid email address."
+    };
+    m.textContent = map[err.code] || "Something went wrong: " + err.code;
+    m.classList.add("show");
+  }
+};
+$("logout").onclick = () => signOut(auth);
+
+onAuthStateChanged(auth, user => {
+  $("auth").style.display = user ? "none" : "block";
+  $("app").style.display = user ? "block" : "none";
+  if (unsub) { unsub(); unsub = null; }
+  if (user) {
+    $("me").textContent = user.displayName || user.email;
+    setDateField("date", viewDate);
+    setDateField("viewDate", viewDate);
+    setTime("09:00");
+    watchDay();
+  }
+});
+
+/* ---------- Day view ---------- */
+function watchDay(){
+  if (unsub) unsub();
+  const d = new Date(viewDate + "T00:00");
+  $("dayTitle").textContent = d.toLocaleDateString(undefined, { weekday:"long", day:"numeric", month:"long", year:"numeric" });
+  unsub = onSnapshot(query(bookings, where("date","==",viewDate)), snap => {
+    current = snap.docs.map(x => ({ id:x.id, ...x.data() })).sort((a,b) => a.start.localeCompare(b.start));
+    render();
+  }, err => { $("list").innerHTML = `<div class="msg warn show">Could not load bookings: ${esc(err.code)}. Check Firestore rules in the README.</div>`; });
+}
+const clashes = (a, b) => a.cat === b.cat && toMin(a.start) < toMin(b.end) && toMin(b.start) < toMin(a.end);
+
+function render(){
+  const uid = auth.currentUser?.uid;
+  $("count").textContent = current.length ? `${current.length} booking${current.length>1?"s":""}` : "";
+  if (!current.length) { $("list").innerHTML = `<div class="empty">No bookings for this day yet.<br>Use the form to add the first one.</div>`; return; }
+  $("list").innerHTML = current.map(b => {
+    const overlap = current.some(o => o.id !== b.id && clashes(b, o));
+    return `<div class="card ${esc(b.cat)} ${overlap?"clash":""}">
+      <div class="t">${fmt12(b.start)}<small>to ${fmt12(b.end)}</small></div>
+      <div>
+        <div class="svc">${esc(b.service)} – ${esc(b.clientName)}</div>
+        <div class="meta">${b.contact ? "📞 " + esc(b.contact) + " · " : ""}Booked by <span class="tag">${esc(b.staffName)}</span></div>
+        ${b.notes ? `<div class="meta">📝 ${esc(b.notes)}</div>` : ""}
+        ${overlap ? `<div class="meta" style="color:var(--rose-dark);font-weight:700">⚠ Overlaps another ${esc(b.cat)} booking</div>` : ""}
+      </div>
+      <div>${b.staffUid === uid ? `<button class="danger small" data-del="${b.id}">Cancel</button>` : ""}</div>
+    </div>`;
+  }).join("");
+}
+$("list").onclick = async e => {
+  const id = e.target.dataset.del;
+  if (id && confirm("Cancel this booking?")) await deleteDoc(doc(db, "bookings", id));
+};
+
+const shift = n => { const d = new Date(viewDate + "T00:00"); d.setDate(d.getDate()+n); viewDate = toISO(d); setDateField("viewDate", viewDate); watchDay(); };
+$("prev").onclick = () => shift(-1);
+$("next").onclick = () => shift(1);
+$("today").onclick = () => { viewDate = toISO(new Date()); setDateField("viewDate", viewDate); watchDay(); };
+
+/* ---------- New booking (with clash check) ---------- */
+let pendingForce = false;
+$("bookForm").onsubmit = async e => {
+  e.preventDefault();
+  const msg = $("bookMsg"); msg.className = "msg";
+  const sel = $("service");
+  const cat = sel.options[sel.selectedIndex].dataset.cat;
+  const date = $("date").value, start = $("start").value;
+  const end = toTime(toMin(start) + Number($("dur").value));
+  const b = { date, start, end, cat, service: sel.value };
+
+  // fetch fresh bookings for the chosen date so the check is always up to date
+  const snap = await getDocs(query(bookings, where("date","==",date)));
+  const hits = snap.docs.map(d => d.data()).filter(o => clashes(b, o));
+  if (hits.length && !pendingForce) {
+    const o = hits[0];
+    msg.className = "msg warn show";
+    msg.innerHTML = `<b>Clash:</b> ${esc(o.clientName)} (${esc(o.service)}) is booked ${fmt12(o.start)}–${fmt12(o.end)} by ${esc(o.staffName)}.<br>
+      Pick another time, or <button type="button" class="small" id="force">Book anyway</button>`;
+    $("force").onclick = () => { pendingForce = true; $("bookForm").requestSubmit(); };
+    return;
+  }
+  pendingForce = false;
+  $("saveBtn").disabled = true;
+  try {
+    const u = auth.currentUser;
+    await addDoc(bookings, {
+      ...b,
+      clientName: $("client").value.trim(),
+      contact: $("contact").value.trim(),
+      notes: $("notes").value.trim(),
+      staffName: u.displayName || u.email,
+      staffUid: u.uid,
+      createdAt: serverTimestamp()
+    });
+    msg.className = "msg good show"; msg.textContent = "Booking saved.";
+    ["client","contact","notes"].forEach(i => $(i).value = "");
+    $("service").selectedIndex = 0;
+    viewDate = date; setDateField("viewDate", date); watchDay(); setTime("09:00");
+  } catch (err) {
+    msg.className = "msg warn show"; msg.textContent = "Could not save: " + err.code;
+  }
+  $("saveBtn").disabled = false;
+};
+</script>
+</body>
+</html>
